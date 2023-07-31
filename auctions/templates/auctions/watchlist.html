@@ -1,0 +1,29 @@
+{% extends "auctions/layout.html" %} {% block body %}
+<div class="container-fluid border rounded mt-3 p-4">
+  <h1 class="mb-3">Watchlist</h1>
+  <div class="row row-cols-1 row-cols-md-4 g-4">
+
+    {% for item in watchlist %}
+    <div class="col">
+      <div class="card shadow h-100">
+        <div class="card-body">
+          <a href="{% url 'show' item.listing.id  %}" class="text-decoration-none">
+            <h5 class="card-title">{{ item.listing.name }}</h5>
+          </a>
+          <h5 class="text-success">${{ item.bid }}</h5>
+          <div class="card-text text-truncate">
+            {{ item.listing.description }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% empty %}
+
+    <p class="lead">Empty</p>
+
+    {% endfor %}
+
+  </div>
+</div>
+{% endblock %}

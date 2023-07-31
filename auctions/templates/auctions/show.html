@@ -1,0 +1,224 @@
+{% extends 'auctions/layout.html' %} {% block body %}
+<div class="container-fluid border rounded mt-3 p-4">
+
+    {% if message %}
+
+    <div x-data="{show: true}" x-show="show" x-init="setTimeout(() => show = false, 5000)" 
+        class="container alert {{ type }}" role="alert">
+        {{ message }}
+    </div>
+
+    {% endif %}
+
+    {% if user == auction.bidder and not auction.listing.is_active %}
+    <div class="container alert alert-success" role="alert">
+      You won this auction!
+    </div>
+    {% elif user != auction.bidder and not auction.listing.is_active %}
+    <div class="container alert alert-warning" role="alert">
+      This auction is no longer active
+    </div>
+    {% endif %}
+    
+
+  <div class="text-center">
+    <h2>{{ auction.listing.name }}</h2>
+    <img
+      src="{{ auction.listing.url_image }}"
+      class="img-fluid"
+      alt=""
+      style="width: 28rem"
+    />
+    <br />
+
+    <div class="mt-2 d-flex justify-content-center">
+      {% if auction.listing.is_active %}
+      <button
+      class="btn btn-outline-success btn-lg"
+      data-bs-toggle="modal"
+      data-bs-target="#exampleModal"
+    >
+      $ {{ auction.bid }}
+    </button>
+
+    {% else %}
+
+    <button
+      class="btn btn-outline-success btn-lg"
+      data-bs-toggle="modal"
+      data-bs-target="#exampleModal"
+      disabled
+    >
+      $ {{ auction.bid }}
+    </button>
+    {% endif %}
+
+
+    <form action="{% url 'show' auction.listing.pk %}" method="POST">
+      {% csrf_token %}
+
+      {% if on_watchlist %}
+      <button type="submit"class="btn btn-outline-primary btn-lg" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Remove from watchlist">
+        <i class="bi bi-bookmark-fill"></i>
+      </button>
+
+      {% else %}
+      <button type="submit" class="btn btn-outline-primary btn-lg" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Add to watchlist">
+        <i class="bi bi-bookmark"></i>
+      </button>
+      {% endif %}
+      
+    </form>
+
+    {% if user == auction.listing.auctioneer and auction.listing.is_active %}
+
+    <a href="{% url 'close_bid' auction.listing.id %}" class="btn btn-outline-warning btn-lg">Close Bid</a>
+
+    {% endif %}
+    </div>
+    
+    <p class="text-body-secondary mt-2">{{ bid_counter }} bid(s)</p>
+  </div>
+
+  <div class="text-center"></div>
+
+  <div class="container justify-content-center">
+    <p>{{ auction.listing.description }}</p>
+
+    {% if auction.listing.category %}
+      <p><span class="text-success">Category:</span> {{ auction.listing.category }}</p>
+    {% else %}
+      <p><span class="text-success">Category:</span> No Category Listed</p>
+    {% endif %}
+
+    <p>Listed By: <span class="text-primary"> {{ auction.listing.auctioneer }} </span> </p>
+  </div>
+
+  <!-- Comment Section   -->
+
+  <div class="container">
+
+    <div class="card p-3">
+
+      <h3 class="text-center">Comments</h3>
+
+      
+      <div class="container overflow-auto" style="max-height: 300px;">
+
+        {% for comment in comments %}
+
+        <p>
+          <b class="text-primary">{{ comment.user }}: </b>
+          {{ comment.comment }}  
+        </p>
+
+        {% empty %}
+
+        <p class="lead text-center">No comments found.</p>
+        {% endfor %}
+
+
+      </div>
+
+      <form action="{% url 'comment' auction.listing.id %}" method="POST">
+        {% csrf_token %}
+        <div class="form-floating mt-3">
+          <textarea name="comment" class="form-control" placeholder="Leave a comment here" id="floatingTextarea" required>
+
+          </textarea>
+          <label for="floatingTextarea">Leave a comment</label>
+        </div>
+  
+        <div class="text-center mt-3">
+          <button type="submit" class="btn btn-primary" >Comment</button>
+        </div>
+      </form>
+
+    
+    </div>
+
+  </div>
+
+
+  <!-- Modal -->
+  <div
+    class="modal fade"
+    id="exampleModal"
+    tabindex="-1"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Bid this item</h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+
+          <div class="modal-body">
+            <div>
+              <h5>Suggested Bid</h5>
+              <form action="{% url 'bid' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="listing_id" value="{{ auction.listing.id }}">
+                <input
+                class="btn btn-outline-secondary"
+                value="{{ auction.bid|add:10 }}"
+                name="new_bid"
+                type="submit"
+              />
+              <input
+                class="btn btn-outline-secondary"
+                value="{{ auction.bid|add:15 }}"
+                name="new_bid"
+                type="submit"
+              />
+              <input
+                class="btn btn-outline-secondary"
+                value="{{ auction.bid|add:20 }}"
+                name="new_bid"
+                type="submit"
+              />
+              </form>
+              
+            </div>
+
+            <div class="mt-3">
+              <h5>Input Bid</h5>
+              <form action="{% url 'bid' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="listing_id" value="{{ auction.listing.id }}">
+              <div class="form-floating mb-3">
+                <input
+                  type="number"
+                  class="form-control"
+                  id="floatingInput"
+                  placeholder="Type your bid"
+                  name="new_bid"
+                />
+                <label for="floatingInput">Type your bid</label>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">Bid</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

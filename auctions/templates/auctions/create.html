@@ -1,0 +1,79 @@
+{% extends "auctions/layout.html" %} {% block body %}
+<div class="container border rounded mt-3 p-3 w-50 bg-auction">
+  {% if message %}
+
+  <div
+    x-data="{show: true}"
+    x-show="show"
+    x-init="setTimeout(() => show = false, 5000)"
+    class="container alert {{ type }}"
+    role="alert"
+  >
+    {{ message }}
+  </div>
+
+  {% endif %}
+  <h2 class="text-center">Create Listing</h2>
+
+  <form action="" method="post" class="row g-3">
+    {% csrf_token %}
+    <div class="col">
+      <input
+        name="name"
+        type="text"
+        class="form-control"
+        placeholder="Name"
+        aria-label="Name"
+      />
+      {% for error in name_errors %}
+      <span class="text-danger">{{ error }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="col">
+      <input
+        name="bid"
+        type="number"
+        class="form-control"
+        placeholder="Starting Bid"
+        aria-label="Starting Bid"
+      />
+      {% for error in bid_errors %}
+      <span class="text-danger">{{ error }} </span>
+      {% endfor %}
+    </div>
+    <div class="col-12">
+      <textarea
+        name="description"
+        class="form-control"
+        placeholder="Description"
+        id="floatingTextarea"
+        style="height: 100px"
+      ></textarea>
+      {% for error in description_errors %}
+      <span class="text-danger">{{ error }} </span>
+      {% endfor %}
+    </div>
+    <div class="col">
+      <input
+        name="url_image"
+        type="text"
+        class="form-control"
+        placeholder="URL image (Optional)"
+        aria-label="URL image"
+      />
+    </div>
+    <div class="col">
+      <select name="category" class="form-select" aria-label="Default select example">
+        <option selected value="" >Select Category (Optional)</option>
+        <option value="Fashion">Fashion</option>
+        <option value="Toys">Toys</option>
+        <option value="Electronics">Electronics</option>
+      </select>
+    </div>
+    <div class="col-12 text-center">
+      <button class="btn btn-success btn-lg">Create</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

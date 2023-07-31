@@ -1,0 +1,41 @@
+{% extends "auctions/layout.html" %} {% block body %}
+<div class="container-fluid border rounded mt-3 p-4">
+  <h1 class="mb-3">Categories</h1>
+  <div class="row row-cols-1 row-cols-md-4 g-4">
+    {% for category in categories %} {% if category.category == "" %}
+    <div class="col">
+      <div class="card shadow h-100">
+        <div class="card-body">
+          <a
+            href="{% url 'index'  %}?category={{ category.category }}"
+            class="text-decoration-none"
+          >
+            <h5 class="card-title">No categories</h5>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    {% else %}
+    <div class="col">
+      <div class="card shadow h-100">
+        <div class="card-body">
+          <a
+            href="{% url 'index'  %}?category={{ category.category }}"
+            class="text-decoration-none"
+          >
+            <h5 class="card-title">{{ category.category }}</h5>
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endif %} 
+
+    {% empty %}
+
+    <p class="lead">No active listing</p>
+
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
