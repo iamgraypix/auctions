@@ -136,7 +136,7 @@ def create(request):
                               url_image=url_image, category=category)
             listing.save()
 
-            Bid(listing=listing, bid=bid).save()
+            Bid(listing=listing, bid=bid, bidder=request.user).save()
 
             print(listing.pk)
 
@@ -153,7 +153,7 @@ def create(request):
 
 
 def show(request, listing_id):
-
+    
     e = request.GET['e'] if bool(request.GET) else None
     # Check if it has some error in listing page
     if e == '0':
@@ -175,6 +175,9 @@ def show(request, listing_id):
     else:
         message = ['', '']
         
+    bids = Bid.objects.filter(listing=listing_id).order_by('-bid')[:1]
+    print(bids)
+    current_bidder = bids[0].bidder
 
     listing = Listing.objects.get(pk=listing_id)
     on_watchlist = False
@@ -206,7 +209,8 @@ def show(request, listing_id):
         "on_watchlist": on_watchlist,
         "message": message[0],
         'type': message[1],
-        'comments': comments
+        'comments': comments,
+        'current_bidder': current_bidder
     })
 
 
